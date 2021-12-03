@@ -11,6 +11,11 @@ class TodoController extends Controller
     
     public function create(Request $request){
         
+        $validated = $request->validate([
+            'name' => 'required|min:3',
+            'category_id' => 'required',
+        ]);
+
         $todo = new Todo;
         $todo->category_id = $request->category_id;
         $todo->name = $request->name;
@@ -19,7 +24,7 @@ class TodoController extends Controller
 
         $todo->category_name = $todo->category->name;
         $todo->timestamp = date('jS, F', strtotime($todo->created_at));
-        
+        $todo->message = "Successfully Added";
         return response()->json($todo);
 
     }

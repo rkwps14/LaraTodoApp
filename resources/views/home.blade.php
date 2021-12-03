@@ -6,6 +6,11 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <style>
+    .input{    position: absolute;
+          margin-top: 74px;
+    }
+  </style>
 </head>
 <div>
   <nav class="navbar navbar-light bg-light">
@@ -21,22 +26,30 @@
   </nav>
 <br>
   <form class="form-inline" style="margin-top: 50px; margin-left: 50px;">
-    <div class="form-group mb-2">
-      <select id="category">
-        <option>Category</option>
-          @foreach($categories as $category)
-          <option value="{{$category->id}}" name="{{$category->name}}">{{$category->name}}</option>
-          @endforeach
-      </select>
-    </div>
-    <div class="form-group mx-sm-3 mb-2">
-      <input type="text" class="form-control" id="todoname" placeholder="Type todo item name" />
-    </div>
-    <input type="button" id="add" value="Add" onClick=addTodo() class="btn btn-primary mb-2" />
+      <div class="form-group mb-2 col-md-1">
+        <select id="category">
+          <option value="">Category</option>
+            @foreach($categories as $category)
+            <option value="{{$category->id}}" name="{{$category->name}}">{{$category->name}}</option>
+            @endforeach
+        </select>
+        <span name= "selectValidationMsg" id="selectValidationMsg" class="text-danger input"></span>
+      </div>
+      <div class="form-group mx-sm-3 mb-2">
+        <input type="text" class="form-control" id="todoname" placeholder="Type todo item name" />
+        <span name= "nameValidationMsg" id="nameValidationMsg" class="text-danger input"></span>
+      </div>
+      <input type="button" id="add" value="Add" onClick=addTodo() class="btn btn-primary mb-2" />
   </form>
 <br>
 <br>
 <br>
+
+@if(Session::has('message'))
+<p class="alert alert-success">{{ Session::get('message') }}</p>
+@endif
+
+<p id="message"></p>
 <div>
   <table class="table table-sm" id="table">
     <thead>
@@ -86,13 +99,26 @@ function addTodo(){
         <td>`+data.timestamp+`</td>
         <td><a href="delete/`+data.id+`" class="btn btn-danger">Delete</a></td></tr>`
       $("#todoList").prepend(html);
-
+      $('#message').html(data.message);
+      $('#message').addClass('alert alert-success');
       $('#todoname').val('');
-      $('#category option:selected').remove();
     }, 
     error: function (request, status, error) {
-      alert('error');
+      let res = JSON.parse(request.responseText);
+        $('#nameValidationMsg').text(res.errors.name);
+        $('#selectValidationMsg').text(res.errors.category_id);
     }
   });
 }
+
+$( document ).ready(function() {
+  $('#category').on('change', function(){
+      $("#selectValidationMsg").html('');
+    });
+
+    $('#todoname').on('keyup',function(){
+      $("#nameValidationMsg").html('');
+    });
+});
+
 </script>

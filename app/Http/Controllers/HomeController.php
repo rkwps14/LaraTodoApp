@@ -25,7 +25,7 @@ class HomeController extends Controller
     public function destroy($id) {
         // print_r($id); exit;
         $todo = Todo::where('id', $id)->firstorfail()->delete();
-          echo ("User Record deleted successfully.");
-          return redirect()->route('home');
+          
+          return redirect()->route('home')->with('message','Successfully Data Delete');
     }
 }
